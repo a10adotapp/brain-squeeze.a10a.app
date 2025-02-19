@@ -24,11 +24,11 @@ jobs:
       - name: docker build
         run: |
           docker build \
-              --tag ${{ secrets.DOCKER_REGISTRY_HOST }}/ephemeral.a10a.app:latest \
-              app
+              --tag ${{ secrets.DOCKER_REGISTRY_HOST }}/brain-squeeze.a10a.app:latest \
+              .
 
       - name: docker push
-        run: docker push ${{ secrets.DOCKER_REGISTRY_HOST }}/ephemeral.a10a.app:latest
+        run: docker push ${{ secrets.DOCKER_REGISTRY_HOST }}/brain-squeeze.a10a.app:latest
 
       - name: setup ssh
         run: |
