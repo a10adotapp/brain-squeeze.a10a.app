@@ -1,12 +1,25 @@
+import { cronscriptToken } from "@/lib/env/cronscript-token";
 import { broadcast } from "@/lib/line/broadcast";
 import { generateQuestion } from "@/lib/openai/generate-question";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export async function POST(request: NextRequest): Promise<Response> {
+  const token = cronscriptToken();
+
+  if (token) {
+    if (token !== request.headers.get("x-cronscript-token")) {
+      return NextResponse.json({
+        error: "Invalid token",
+      }, {
+        status: 401,
+      });
+    }
+  }
+
   const questionData = await generateQuestion();
 
-  let createdQuestion = await prisma.question.create({
+  const createdQuestion = await prisma.question.create({
     data: {
       question: questionData.question,
     },
