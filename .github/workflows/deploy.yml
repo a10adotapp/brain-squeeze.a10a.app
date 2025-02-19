@@ -40,7 +40,7 @@ jobs:
       - name: ssh deploy
         run: |
           ssh ${{ secrets.SSH_USER}}@${{ secrets.SSH_HOST }} ' \
-              cd ~/ephemeral.a10a.app \
+              cd ~/brain-squeeze.a10a.app \
                && docker compose pull \
                && docker compose build \
                && docker compose up -d \
