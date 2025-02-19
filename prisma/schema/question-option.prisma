@@ -1,0 +1,26 @@
+/// クイズ選択肢
+///
+/// @namespace クイズ
+model QuestionOption {
+  id String @id @default(cuid(2)) @db.VarChar(30)
+
+  questionId String @map("question_id") @db.VarChar(30)
+
+  /// 選択肢テキスト
+  optionText String @map("option_text") @db.Text
+
+  /// 選択肢解説
+  description String @map("description") @db.Text
+
+  /// 選択肢の正解フラグ
+  isCorrect Boolean @default(false) @map("is_correct")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  question       Question         @relation(fields: [questionId], references: [id])
+  questionAnswer QuestionAnswer[]
+
+  @@map("question_options")
+}

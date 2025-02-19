@@ -1,0 +1,21 @@
+/// ユーザーの回答
+///
+/// @namespace クイズ
+model QuestionAnswer {
+  id String @id @default(cuid(2)) @db.VarChar(30)
+
+  questionId       String @map("question_id") @db.VarChar(30)
+  questionOptionId String @map("question_option_id") @db.VarChar(30)
+
+  /// LINEユーザーID
+  lineUserId String @default("") @map("line_user_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  question       Question       @relation(fields: [questionId], references: [id])
+  questionOption QuestionOption @relation(fields: [questionOptionId], references: [id])
+
+  @@map("question_answers")
+}
