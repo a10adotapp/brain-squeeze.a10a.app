@@ -12,7 +12,7 @@ const resultSchema = z.object({
   ),
 });
 
-export async function generateQuestion(): Promise<z.output<typeof resultSchema>> {
+export async function generateQuestionData(): Promise<z.output<typeof resultSchema>> {
   const openai = new OpenAI();
 
   const completion = await openai.chat.completions.create({

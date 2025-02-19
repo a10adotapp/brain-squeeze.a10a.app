@@ -1,7 +1,7 @@
 import { lineChannelAccessToken } from "@/lib/env/line-channel-access-token";
 
 export async function broadcast(messages: unknown[]): Promise<void> {
-  await fetch(
+  const response = await fetch(
     "https://api.line.me/v2/bot/message/broadcast",
     {
       method: "POST",
@@ -14,4 +14,12 @@ export async function broadcast(messages: unknown[]): Promise<void> {
       }),
     },
   );
+
+  if (!response.ok) {
+    console.error(JSON.stringify({
+      function: "lib.line.broadcast",
+      status: response.status,
+      body: await response.text(),
+    }));
+  }
 }

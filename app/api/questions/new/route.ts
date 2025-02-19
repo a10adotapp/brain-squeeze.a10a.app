@@ -1,6 +1,7 @@
 import { cronscriptToken } from "@/lib/env/cronscript-token";
 import { broadcast } from "@/lib/line/broadcast";
-import { generateQuestion } from "@/lib/openai/generate-question";
+import { generateQuestionData } from "@/lib/openai/generate-question-data";
+import { generateQuestionImage } from "@/lib/openai/generate-question-image";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     }
   }
 
-  const questionData = await generateQuestion();
+  const questionData = await generateQuestionData();
 
   const createdQuestion = await prisma.question.create({
     data: {
@@ -44,15 +45,17 @@ export async function POST(request: NextRequest): Promise<Response> {
     },
   });
 
+  const imageUrl = await generateQuestionImage(question);
+
   await broadcast([
     {
       type: "flex",
-      altText: "社会人マナークイズ",
+      altText: question.question,
       contents: {
         type: "bubble",
         hero: {
           type: "image",
-          url: "https://developers-resource.landpress.line.me/fx/img/01_1_cafe.png",
+          url: imageUrl || "https://developers-resource.landpress.line.me/fx/img/01_1_cafe.png",
           size: "full",
           aspectRatio: "20:13",
           aspectMode: "cover",
@@ -70,26 +73,53 @@ export async function POST(request: NextRequest): Promise<Response> {
             },
           ],
         },
-        footer: {
-          type: "box",
-          layout: "vertical",
-          spacing: "sm",
-          contents: question.options.map((option) => ({
-            type: "button",
-            height: "sm",
-            action: {
-              type: "postback",
-              label: option.optionText,
-              data: JSON.stringify({
-                action: "answer",
-                question: question.id,
-                option: option.id,
-              }),
-            },
-          })),
-        },
       },
     },
+    ...question.options.map((questionOption) => ({
+      type: "flex",
+      altText: [
+        question.question,
+        "-----",
+        questionOption.optionText,
+      ].join("\n"),
+      contents: {
+        type: "bubble",
+        body: {
+          type: "box",
+          layout: "horizontal",
+          spacing: "md",
+          contents: [
+            {
+              type: "box",
+              layout: "vertical",
+              flex: 2,
+              contents: [
+                {
+                  type: "text",
+                  text: questionOption.optionText,
+                  wrap: true,
+                },
+              ],
+            },
+            {
+              type: "button",
+              flex: 1,
+              style: "secondary",
+              height: "sm",
+              action: {
+                type: "postback",
+                label: "選択",
+                data: JSON.stringify({
+                  action: "answer",
+                  question: question.id,
+                  option: questionOption.id,
+                }),
+              },
+            }
+          ],
+        },
+      },
+    })),
   ]);
 
   return NextResponse.json({
