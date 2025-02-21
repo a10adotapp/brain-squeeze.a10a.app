@@ -30,6 +30,7 @@ export async function getQuestion(id: string): Promise<
       },
     },
     where: {
+      deletedAt: null,
       id: id,
     },
   });

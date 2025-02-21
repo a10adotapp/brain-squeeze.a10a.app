@@ -1,3 +1,10 @@
+"use client";
+
+import { Context as LiffContext } from "@/app/_contexts/liff-context";
+import { use } from "react";
+
 export default function Page() {
-  return "squeeze.a10a.app";
+  const { liff } = use(LiffContext);
+
+  return JSON.stringify(liff?.getContext(), null, "  ");
 }

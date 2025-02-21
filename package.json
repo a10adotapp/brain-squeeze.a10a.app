@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@formkit/tempo": "^0.1.2",
+    "@line/liff": "^2.25.1",
     "@prisma/client": "^6.4.0",
     "@radix-ui/react-progress": "^1.1.2",
     "class-variance-authority": "^0.7.1",

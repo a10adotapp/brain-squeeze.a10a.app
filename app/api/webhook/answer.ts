@@ -62,23 +62,27 @@ export async function answer(lineUserId: string, data: {
     });
   }
 
-  const previousQuestionAnswerCount = await prisma.questionAnswer.count({
-    where: {
-      deletedAt: null,
-      questionId: question.id,
-      createdAt: {
-        lte: questionAnswer.createdAt,
+  let previousQuestionAnswerCount = 0;
+
+  if (questionOption.isCorrect) {
+    previousQuestionAnswerCount = await prisma.questionAnswer.count({
+      where: {
+        deletedAt: null,
+        questionId: question.id,
+        createdAt: {
+          lte: questionAnswer.createdAt,
+        },
+        id: {
+          not: questionAnswer.id,
+        },
       },
-      id: {
-        not: questionAnswer.id,
-      },
-    },
-  });
+    });
+  }
 
   await reply(data.replyToken, [
     {
       type: "flex",
-      altText: "回答結果",
+      altText: question.question,
       contents: {
         type: "bubble",
         body: {
@@ -98,6 +102,33 @@ export async function answer(lineUserId: string, data: {
               weight: "bold",
               wrap: true,
             },
+            ...(questionOption.isCorrect ? [
+              {
+                type: "text",
+                text: "正解",
+                size: "xl",
+                align: "center",
+                weight: "bold",
+                color: "#33cc33",
+              },
+              {
+                type: "text",
+                text: `${previousQuestionAnswerCount + 1} 位`,
+                size: "md",
+                align: "center",
+                weight: "bold",
+                color: "#33cc33",
+              },
+            ] : [
+              {
+                type: "text",
+                text: "不正解",
+                size: "xl",
+                align: "center",
+                weight: "bold",
+                color: "#cc3333",
+              },
+            ]),
             {
               type: "box",
               layout: "vertical",
@@ -123,28 +154,6 @@ export async function answer(lineUserId: string, data: {
                         format: "YYYY/MM/DD HH:mm",
                         tz: "Asia/Tokyo",
                       }),
-                      size: "sm",
-                      color: "#666666",
-                      flex: 2,
-                      wrap: true,
-                    },
-                  ],
-                },
-                {
-                  type: "box",
-                  layout: "baseline",
-                  spacing: "sm",
-                  contents: [
-                    {
-                      type: "text",
-                      text: "順位",
-                      size: "sm",
-                      color: "#999999",
-                      flex: 1,
-                    },
-                    {
-                      type: "text",
-                      text: `${previousQuestionAnswerCount + 1} 位`,
                       size: "sm",
                       color: "#666666",
                       flex: 2,
