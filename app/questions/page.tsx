@@ -1,6 +1,8 @@
 import { listQuestionCached } from "./_actions/list-question";
 import { QuestionList } from "./_components/question-list";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
   const questions = await listQuestionCached();
 
